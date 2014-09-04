@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Web Cabin's Undo Manager</title>
+    <!-- Core Modules -->
+    <script src="wcUndoManager.js"></script>
+
+    <!-- Initialization -->
+    <script>
+      var undoManager = new wcUndoManager();
+      var currentValue = "";
+
+      function updateState() {
+        var undoButton = document.getElementById("undo");
+        undoButton.disabled = !undoManager.canUndo();
+
+        var redoButton = document.getElementById("redo");
+        redoButton.disabled = !undoManager.canRedo();
+
+        var modifiedSpan = document.getElementById("modified");
+        if (undoManager.isModified()) {
+          modifiedSpan.innerHTML = "The current state is modified!";
+        } else {
+          modifiedSpan.innerHTML = "The current state is un-modified";
+        }
+      }
+
+      function onTextChanged() {
+        var oldValue = currentValue;
+        var newValue = document.getElementById("edit").value;
+        undoManager.addEvent("Text Changed",
+          // Init
+          function() {
+            this.oldValue = oldValue;
+            this.newValue = newValue;
+          },
+          // Undo
+          function() {
+            return {
+              editValueChanged: this.oldValue,
+            };
+          },
+          // Redo
+          function() {
+            return {
+              editValueChanged: this.newValue,
+            };
+          });
+        currentValue = newValue;
+
+        updateState();
+      };
+
+      function performUndo() {
+        var obj = undoManager.undo();
+        if (obj.hasOwnProperty("editValueChanged")) {
+          currentValue = obj.editValueChanged;
+          document.getElementById("edit").value = obj.editValueChanged;
+        }
+        updateState();
+      };
+
+      function performRedo() {
+        var obj = undoManager.redo();
+        if (obj.hasOwnProperty("editValueChanged")) {
+          currentValue = obj.editValueChanged;
+          document.getElementById("edit").value = obj.editValueChanged;
+        }
+        updateState();
+      };
+
+      function clearModified() {
+        undoManager.clearModified();
+        updateState();
+      };
+
+    </script>
+  </head>
+  <body style="background-color: lightgrey;">
+    The following is a simple example of Web Cabin's Undo Manager system found here:<br>
+    <a href="https://github.com/Lochemage/wcUndoManager/">https://github.com/Lochemage/wcUndoManager/</a><br><br>
+    Each change to this text field will be recorded by the undo manager, you can then cycle through these recorded events with the undo/redo buttons:<br>
+    <input id="edit" type="text" onchange="onTextChanged()"/>
+    <input id="undo" type="button" value="Undo" onclick="performUndo()", disabled="disabled"/>
+    <input id="redo" type="button" value="Redo" onclick="performRedo()", disabled="disabled"/><br><br>
+    <span id="modified">The current state is un-modified.</span>
+    <input id="save" type="button" value="Set as Current State" onclick="clearModified()"/>
+  </body>
+</html>
