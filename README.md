@@ -49,35 +49,37 @@ To perform an undo or redo event, simply call the undo or redo functions on the 
 
 You can group several undo events into a single event by wrapping all calls to addEvent() between a call to beginGroup() and endGroup().  Multiple groups can also be made inside of another group (you must still call endGroup() for each one), although it has no functional advantage as they are all combined into a single final event.
 
-The Undo and Redo event function callbacks from addEvent() can optionally return an object value with properties inside.  This object can then be caught as a result of the managers undo() or redo() call and then used as desired.  Most notably, this feature is meant to be used to specify what changed in order to more accurately target page refresh.  For example, if we were to change the above example to this instead:
+The Undo and Redo event function callbacks from addEvent() can optionally return an object value with properties inside.  This object can then be caught as a result of the managers undo() or redo() call and then used as desired.  Most notably, this feature is meant to be used to specify what changed in order to more accurately target page refresh.
 
+In this example, we take our previous example and add a return value.
+
+    var oldValue; // This should contain the old value of the element before the change.
+    var newValue = document.getElementById("edit").value;
     undoManager.addEvent("Text Changed",
-      // Init
+      // Init Function
       function() {
         this.oldValue = oldValue;
         this.newValue = newValue;
       },
-      // Undo
+      // Undo Function
       function() {
-        return {
-          editValueChanged: this.oldValue,
-        };
+        document.getElementById("edit").value = this.oldValue;
+        return {editValueChanged: true};
       },
-      // Redo
+      // Redo Function
       function() {
-        return {
-          editValueChanged: this.newValue,
-        };
+        document.getElementById("edit").value = this.newValue;
+        return {editValueChanged: true};
       });
-
-If you notice, in this example we no longer call document.getElementById() to change the displayed value directly, instead we return an object with a property containing the changed value and then we can catch it during our call to undo or redo:
+      
+Now, whenever this event is called, it will return the property 'editValueChanged' into our result.
 
     var obj = undoManager.undo();
     if (obj.hasOwnProperty("editValueChanged")) {
-      document.getElementById("edit").value = obj.editValueChanged;
+      // Perform some operation, possibly a refresh on a specific item within the app.
     }
 
-The reason the return value is in the form of an object with properties is because those properties can automatically be combined during a group operation.
+Group events will automatically attempt to combine multiple event results into a single object.
 
 Assuming all saveable actions are recorded as undo events, the manager can also keep track of whether the current state of the application is modified from its last recorded position.  This means whenever a new undo event is added, the state is modified, but that modified state will go away if the user undoes that action.  When the application is saved, a call to clearModified() will assign the current state as the un-modified state.  You can then use isModified() at any time to check whether your application contains any changes.
 
