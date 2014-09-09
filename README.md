@@ -6,7 +6,7 @@ Web Cabin's Undo Manager can be used to effectively provide undo/redo events int
 View a simple demonstration here: [http://undo.webcabin.org](http://undo.webcabin.org)
 
 ****
-## Basic Usage ##  
+## Basic Usage ##
 
 Begin by initializing an instance of the undo manager:
 
