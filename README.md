@@ -64,12 +64,12 @@ In this example, we take our previous example and add a return value.
       // Undo Function
       function() {
         document.getElementById("edit").value = this.oldValue;
-        return {editValueChanged: true};
+        return {editValueChanged: this.oldValue};
       },
       // Redo Function
       function() {
         document.getElementById("edit").value = this.newValue;
-        return {editValueChanged: true};
+        return {editValueChanged: this.newValue};
       });
       
 Now, whenever this event is called, it will return the property 'editValueChanged' into our result.
