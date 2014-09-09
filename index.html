@@ -36,15 +36,13 @@
           },
           // Undo
           function() {
-            return {
-              editValueChanged: this.oldValue,
-            };
+            document.getElementById("edit").value = this.oldValue;
+            return {editValueChanged: this.oldValue};
           },
           // Redo
           function() {
-            return {
-              editValueChanged: this.newValue,
-            };
+            document.getElementById("edit").value = this.newValue;
+            return {editValueChanged: this.newValue};
           });
         currentValue = newValue;
 
@@ -55,7 +53,6 @@
         var obj = undoManager.undo();
         if (obj.hasOwnProperty("editValueChanged")) {
           currentValue = obj.editValueChanged;
-          document.getElementById("edit").value = obj.editValueChanged;
         }
         updateState();
       };
@@ -64,7 +61,6 @@
         var obj = undoManager.redo();
         if (obj.hasOwnProperty("editValueChanged")) {
           currentValue = obj.editValueChanged;
-          document.getElementById("edit").value = obj.editValueChanged;
         }
         updateState();
       };
