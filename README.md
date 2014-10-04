@@ -43,11 +43,15 @@ To perform an undo or redo event, simply call the undo or redo functions on the 
     undoManager.undo();
     // or
     undoManager.redo();
+    
+The canUndo() and canRedo() functions will tell you whether an undo or redo action can be done.
+
+The undoInfo() and redoInfo() functions will retrieve the description of the very next undo or redo event in the stack, this is useful if you want your undo/redo buttons to show tooltips or descriptions about what is about to be undone.
 
 ****
 ## Advanced Usage ##
 
-You can group several undo events into a single event by wrapping all calls to addEvent() between a call to beginGroup() and endGroup().  Multiple groups can also be made inside of another group (you must still call endGroup() for each one), although it has no functional advantage as they are all combined into a single final event.
+You can group several undo events together into a single event by wrapping those events between calls to beginGroup() and endGroup().  For example, if you are writing a paint program and every pixel painted creates a new undo event, you wouldn't want the user to have to undo dozens of times just to undo a single line they made.  The solution is to beginGroup() when the user presses down on the mouse and then endGroup() when they release, every undo pixel event added in between these calls will automatically be groupped together and treated as one event.
 
 The Undo and Redo event function callbacks from addEvent() can optionally return an object value with properties inside.  This object can then be caught as a result of the managers undo() or redo() call and then used as desired.  Most notably, this feature is meant to be used to specify what changed in order to more accurately target page refresh.
 
