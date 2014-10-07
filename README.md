@@ -12,22 +12,23 @@ Begin by initializing an instance of the undo manager:
 
     var undoManager = new wcUndoManager();
 
-To add an event into the manager, call addEvent() and pass in a description and three functions as parameters:
-* Init(): This will initialize the event, use 'this' to assign new object variables to it.
-* Undo(): This function will be called whenever the event is being un-done.  Use values stored previously by the init function by accessing 'this'.  A return object value can optionally be provided and used after the event has processed.
-* Redo(): This function will be called whenever the event is being re-done.  Use values stored previously by the init function by accessing 'this'.  A return object value can optionally be provided and used after the event has processed.
+To add an event into the manager, call addEvent() with the following parameters:
+* info: A string value that describes the event.
+* data: This data will be stored with the event, it should be an object that contains enough information to perform both undo and redo events, and should not contain object references that could potentially change.
+* Undo(): This function will be called whenever the event is being un-done.  The 'this' variable will be the previously entered data object.
+* Redo(): This function will be called whenever the event is being re-done.  The 'this' variable will be the previously entered data object.
 
-    undoManager.addEvent(Init, Undo, Redo);
+    undoManager.addEvent(info, data, Undo, Redo);
 
 Here is an example:
 
     var oldValue; // This should contain the old value of the element before the change.
     var newValue = document.getElementById("edit").value;
     undoManager.addEvent("Text Changed",
-      // Init Function
-      function() {
-        this.oldValue = oldValue;
-        this.newValue = newValue;
+      // Data
+      {
+        oldValue: oldValue,
+        newValue: newValue
       },
       // Undo Function
       function() {
