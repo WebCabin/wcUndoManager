@@ -28,22 +28,20 @@
       function onTextChanged() {
         var oldValue = currentValue;
         var newValue = document.getElementById("edit").value;
-        undoManager.addEvent("Text Changed",
-          // Init
-          function() {
-            this.oldValue = oldValue;
-            this.newValue = newValue;
-          },
-          // Undo
-          function() {
-            document.getElementById("edit").value = this.oldValue;
-            return {editValueChanged: this.oldValue};
-          },
-          // Redo
-          function() {
-            document.getElementById("edit").value = this.newValue;
-            return {editValueChanged: this.newValue};
-          });
+        undoManager.addEvent("Text Changed", {
+          oldValue: oldValue,
+          newValue: newValue,
+        },
+        // Undo
+        function() {
+          document.getElementById("edit").value = this.oldValue;
+          return {editValueChanged: this.oldValue};
+        },
+        // Redo
+        function() {
+          document.getElementById("edit").value = this.newValue;
+          return {editValueChanged: this.newValue};
+        });
         currentValue = newValue;
 
         updateState();

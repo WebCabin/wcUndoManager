@@ -118,21 +118,23 @@ wcUndoManager.prototype = {
   // in order to more accurately target page refresh.
   // Params:
   //    info    A string that describes the event.
-  //    init    Callback function to initialize the event.
-  //              'this' is the event object.
+  //    data    Custom data to store inside the event.  This is an
+  //            object that contains both the previous and new values
+  //            so that both undo and redo events can be performed.
   //    undo    Callback function to perform the undo event.
-  //              'this' is the event object.
+  //            The 'this' variable is the data given.
   //    redo    Callback function to perform the redo event.
-  //              'this' is the event object.
+  //            The 'this' variable is the data given.
   // Return:
   //    The event object created, or false if error.
-  addEvent: function(info, init, undo, redo) {
+  addEvent: function(info, data, undo, redo) {
     if (this._performingEvent || !this._enabled) {
       return false;
     }
 
     var event = {
       info: info,
+      data: data,
       undo: undo,
       redo: redo,
     };
@@ -143,10 +145,6 @@ wcUndoManager.prototype = {
 
     if (typeof event.redo !== 'function') {
       return false;
-    }
-
-    if (typeof init === 'function') {
-      init.call(event);
     }
 
     if (this._groupList.length) {
@@ -230,7 +228,7 @@ wcUndoManager.prototype = {
       this._performingEvent = true;
       var event = this._undoList.pop();
 
-      var options = event.undo();
+      var options = event.undo.call(event.data);
 
       this._redoList.push(event);
       this._performingEvent = false;
@@ -253,7 +251,7 @@ wcUndoManager.prototype = {
       this._performingEvent = true;
       var event = this._redoList.pop();
 
-      var options = event.redo();
+      var options = event.redo.call(event.data);
 
       this._undoList.push(event);
       this._performingEvent = false;
