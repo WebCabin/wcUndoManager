@@ -168,6 +168,52 @@ wcUndoManager.prototype = {
     return event;
   },
 
+  // --------------------------------------------------------------------------------
+  // An alternative to the addEvent() method.  This one just takes an already
+  // constructed event object, it needs to contain an undo and redo function,
+  // along with any internal variables that it needs to function.
+  addEventRaw: function(event) {
+    if (this._performingEvent || !this._enabled) {
+      return false;
+    }
+
+    if (typeof event !== 'object') {
+      return false;
+    }
+
+    if (typeof event.undo !== 'function') {
+      return false;
+    }
+
+    if (typeof event.redo !== 'function') {
+      return false;
+    }
+
+    if (typeof event.info !== 'string') {
+      event.info = '';
+    }
+
+    if (this._groupList.length) {
+      this._groupList[this._groupList.length-1].addEvent(event);
+    } else {
+      if (this._currentEvent > this._undoList.length) {
+        this._currentEvent = -1;
+      }
+
+      this._redoList.clear();
+      this._undoList.push(event);
+
+      // Limit the size of undo events available.
+      while (ARPG.UNDO_LIMIT > 0 && this._undoList.length > ARPG.UNDO_LIMIT) {
+        this._undoList.pop(0);
+        if (this._currentEvent > -1) {
+          this._currentEvent--;
+        }
+      }
+    }
+    return event;
+  },
+
   // ---------------------------------------------------------------------------
   // This will clear the modified state of the manager.  Use this method during
   // a save operation for example.  This does not clear the undo/redo events, it
