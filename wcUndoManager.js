@@ -86,7 +86,7 @@ wcUndoManager.prototype = {
       this.addEvent(group.info,
         // Data
         {
-          eventList: group.eventList;
+          eventList: group.eventList,
         },
         // Undo
         function() {
