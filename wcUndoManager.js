@@ -278,10 +278,10 @@ wcUndoManager.prototype = {
     if (this._undoList.length && !this._performingEvent) {
       this._performingEvent = true;
       var event = this._undoList.pop();
+      this._redoList.push(event);
 
       var options = event.undo.call(event.data);
 
-      this._redoList.push(event);
       this._performingEvent = false;
       if (!options) {
         return {};
@@ -301,10 +301,10 @@ wcUndoManager.prototype = {
     if (this._redoList.length && !this._performingEvent) {
       this._performingEvent = true;
       var event = this._redoList.pop();
+      this._undoList.push(event);
 
       var options = event.redo.call(event.data);
 
-      this._undoList.push(event);
       this._performingEvent = false;
       if (!options) {
         return {};
