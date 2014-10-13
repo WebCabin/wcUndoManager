@@ -26,9 +26,58 @@ wcUndoManager.prototype = {
 
     var group = {
       info: info,
-      eventList: [],
+      data: {
+        eventList: [],
+        combineOptions: function(a, b) {
+          // Ensure both items are objects.
+          if (typeof a !== 'object') {
+            return b;
+          }
+          if (typeof b !== 'object') {
+            return a;
+          }
+
+          // Iterate through each property in object b.
+          for (prop in b) {
+            if (b.hasOwnProperty(prop)) {
+              // If object a also contains the same property.
+              if (a.hasOwnProperty(prop)) {
+                // Append to an array.
+                if ($.isArray(a[prop]) &&
+                    $.isArray(b[prop])) {
+                  a[prop] = a[prop].concat(b[prop]);
+                // If this is a nested object, try combining that as well.
+                } else {
+                  this.combineOptions.call(this, a[prop], b[prop]);
+                }
+              // If object a does not have this property yet.
+              } else {
+                a[prop] = b[prop];
+              }
+            }
+          }
+        },
+      },
       addEvent: function(event) {
-        this.eventList.push(event);
+        this.data.eventList.push(event);
+      },
+      // Undo
+      undo: function() {
+        var options = {};
+        for (var i = this.eventList.length - 1; i >= 0; --i) {
+          var result = this.eventList[i].undo.call(this.eventList[i].data);
+          this.combineOptions.call(this, options, result);
+        }
+        return options;
+      },
+      // Redo
+      redo: function() {
+        var options = {};
+        for (var i = 0; i < this.eventList.length; ++i) {
+          var result = this.eventList[i].redo.call(this.eventList[i].data);
+          this.combineOptions.call(this, options, result);
+        }
+        return options;
       },
     };
 
@@ -49,63 +98,11 @@ wcUndoManager.prototype = {
       var group = this._groupList.pop();
 
       // Don't add empty groups to the event list.
-      if (group.eventList.length === 0) {
+      if (group.data.eventList.length === 0) {
         return;
       }
 
-      function _combineOptions(a, b) {
-        // Ensure both items are objects.
-        if (typeof a !== 'object') {
-          return b;
-        }
-        if (typeof b !== 'object') {
-          return a;
-        }
-
-        // Iterate through each property in object b.
-        for (prop in b) {
-          if (b.hasOwnProperty(prop)) {
-            // If object a also contains the same property.
-            if (a.hasOwnProperty(prop)) {
-              // Append to an array.
-              if ($.isArray(a[prop]) &&
-                  $.isArray(b[prop])) {
-                a[prop] = a[prop].concat(b[prop]);
-              // If this is a nested object, try combining that as well.
-              } else {
-                _combineOptions(a[prop], b[prop]);
-              }
-            // If object a does not have this property yet.
-            } else {
-              a[prop] = b[prop];
-            }
-          }
-        }
-      };
-
-      this.addEvent(group.info,
-        // Data
-        {
-          eventList: group.eventList,
-        },
-        // Undo
-        function() {
-          var options = {};
-          for (var i = this.eventList.length - 1; i >= 0; --i) {
-            var result = this.eventList[i].undo.call(this.eventList[i].data);
-            _combineOptions(options, result);
-          }
-          return options;
-        },
-        // Redo
-        function() {
-          var options = {};
-          for (var i = 0; i < this.eventList.length; ++i) {
-            var result = this.eventList[i].redo.call(this.eventList[i].data);
-            _combineOptions(options, result);
-          }
-          return options;
-        });
+      this.addEventRaw(group);
       return true;
     }
     return false;
