@@ -92,7 +92,7 @@ wcUndoManager.prototype = {
         function() {
           var options = {};
           for (var i = this.eventList.length - 1; i >= 0; --i) {
-            var result = this.eventList[i].undo();
+            var result = this.eventList[i].undo.call(this.eventList[i].data);
             _combineOptions(options, result);
           }
           return options;
@@ -101,7 +101,7 @@ wcUndoManager.prototype = {
         function() {
           var options = {};
           for (var i = 0; i < this.eventList.length; ++i) {
-            var result = this.eventList[i].redo();
+            var result = this.eventList[i].redo.call(this.eventList[i].data);
             _combineOptions(options, result);
           }
           return options;
@@ -172,6 +172,14 @@ wcUndoManager.prototype = {
   // An alternative to the addEvent() method.  This one just takes an already
   // constructed event object, it needs to contain an undo and redo function,
   // along with any internal variables that it needs to function.
+  // Params:
+  //    event               The raw event object.
+  //      {
+  //        info: String    An informative string that describes the event.
+  //        data: Object    An object that contains data used for the event.
+  //        undo: Function  A function callback to undo the event, 'this' is the above data object.
+  //        redo: Function  A function callback to redo the event, 'this' is the above data object.
+  //      }
   addEventRaw: function(event) {
     if (this._performingEvent || !this._enabled) {
       return false;
@@ -200,7 +208,7 @@ wcUndoManager.prototype = {
         this._currentEvent = -1;
       }
 
-      this._redoList.clear();
+      while (this._redoList.pop());
       this._undoList.push(event);
 
       // Limit the size of undo events available.
