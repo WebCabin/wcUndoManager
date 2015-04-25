@@ -61,10 +61,10 @@ In this example, we take our previous example and add a return value.
     var oldValue; // This should contain the old value of the element before the change.
     var newValue = document.getElementById("edit").value;
     undoManager.addEvent("Text Changed",
-      // Init Function
-      function() {
-        this.oldValue = oldValue;
-        this.newValue = newValue;
+      // Data
+      {
+        oldValue: oldValue,
+        newValue: newValue,
       },
       // Undo Function
       function() {
