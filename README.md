@@ -19,7 +19,7 @@ Web Cabin's Undo Manager can be used to effectively provide undo/redo events int
 * Undo or Redo any operation.
 * Group multiple operations into a single event.
 * Keep track of changes made since you last saved.
-
+* Completely free and open source!
 
 ****
 ## Basic Usage ##
