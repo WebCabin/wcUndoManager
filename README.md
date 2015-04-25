@@ -64,7 +64,7 @@ In this example, we take our previous example and add a return value.
       // Data
       {
         oldValue: oldValue,
-        newValue: newValue,
+        newValue: newValue
       },
       // Undo Function
       function() {
