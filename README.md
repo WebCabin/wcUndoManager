@@ -22,6 +22,15 @@ Web Cabin's Undo Manager can be used to effectively provide undo/redo events int
 * Completely free and open source!
 
 ****
+## Installation ##
+
+You can manually copy the source file, or use bower
+```
+npm install -g bower
+bower install wcUndoManager
+```
+
+****
 ## Basic Usage ##
 
 Begin by initializing an instance of the undo manager:
