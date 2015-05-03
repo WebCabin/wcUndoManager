@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "homepage": "http://undo.webcabin.org/",
   "main": [
-    '.'
+    "."
   ],
   "ignore": [
     "/.*",
