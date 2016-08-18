@@ -2,6 +2,7 @@
   "name": "webcabin-undo-manager",
   "version": "1.0.1",
   "homepage": "http://undo.webcabin.org/",
+  "description": "Application Undo Management",
   "main": [
     "."
   ],
