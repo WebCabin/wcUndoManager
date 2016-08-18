@@ -1,0 +1,7 @@
+{
+  "name": "webcabin-undo-manager",
+  "author": "WebCabin",
+  "version": "1.0.0",
+  "description": "Application Undo Management",
+  "main": "wcUndoManager.js"
+}

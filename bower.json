@@ -1,5 +1,5 @@
 {
-  "name": "wcUndoManager",
+  "name": "webcabin-undo-manager",
   "version": "1.0.0",
   "homepage": "http://undo.webcabin.org/",
   "main": [
